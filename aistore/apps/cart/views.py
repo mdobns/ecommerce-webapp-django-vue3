@@ -1,24 +1,28 @@
-import json
 from django.shortcuts import render
-from .cart import Cart
+from apps.store.models import Product
+import json
 
 def cart_detail(request):
-    cart = Cart(request)
-    
-    products = []
+    cart = request.session.get('cart', {})
+    products_in_cart = []
 
-    for item in cart:
-        product = item['product']
-        products.append({
+    for product_id, item in cart.items():  # item is the dict
+        try:
+            product = Product.objects.get(id=product_id)
+        except Product.DoesNotExist:
+            continue
+
+        quantity = item.get('quantity', 0)
+        products_in_cart.append({
             'id': product.id,
             'title': product.title,
             'price': float(product.price),
-            'quantity': item['quantity'],
-            'total_price': item['total_price']
+            'quantity': quantity,
+            'total_cost': float(product.price) * quantity
         })
 
     context = {
         'cart': cart,
-        'products_json': json.dumps(products)  # Proper JSON array
+        'products_json': json.dumps(products_in_cart)
     }
     return render(request, 'cart.html', context)

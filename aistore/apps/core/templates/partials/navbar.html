@@ -1,59 +1,45 @@
 <!-- Navbar Partial -->
-<nav id="navbar" class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 shadow-lg">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between h-16 items-center">
+<div id="navbarApp">
+  <nav class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 shadow-lg">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16 items-center">
 
-      <!-- Logo -->
-      <a href="{% url 'frontpage' %}" class="text-2xl font-bold tracking-wide text-white">
-        <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Ai Shop</span>
-      </a>
+        <!-- Logo -->
+        <a href="{% url 'frontpage' %}" class="text-2xl font-bold tracking-wide text-white">
+          <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Ai Shop</span>
+        </a>
 
-      <!-- Desktop Menu -->
-      <div class="hidden md:flex space-x-6 items-center">
-        {% for category in menu_categories %}
-          <a href="{% url 'category_detail' category.slug %}" class="hover:text-cyan-400 transition">
-            {{ category.title }}
+        <!-- Desktop Menu -->
+        <div class="hidden md:flex space-x-6 items-center">
+          {% for category in menu_categories %}
+            <a href="{% url 'category_detail' category.slug %}" class="hover:text-cyan-400 transition">
+              {{ category.title }}
+            </a>
+          {% endfor %}
+          <a href="{% url 'cart' %}" 
+             class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
+             🛒 Cart ([[ numItems ]])
           </a>
-        {% endfor %}
-        <a href="{% url 'cart' %}" 
-           class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
-           🛒 Cart
-        </a>
-      </div>
-
-      <!-- Mobile Hamburger -->
-      <div class="md:hidden flex items-center">
-        <button @click="isOpen = !isOpen" class="text-white focus:outline-none">
-          <svg class="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <!-- Hamburger lines -->
-            <path :class="{'hidden': isOpen, 'inline-flex': !isOpen }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16"/>
-            <!-- X icon -->
-            <path :class="{'inline-flex': isOpen, 'hidden': !isOpen }" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 6l12 12M6 18L18 6"/>
-          </svg>
-        </button>
-      </div>
-
-    </div>
-
-    <!-- Mobile Menu -->
-    <div v-show="isOpen" class="md:hidden mt-2 space-y-2 px-2 pb-3">
-      {% for category in menu_categories %}
-        <a href="{% url 'category_detail' category.slug %}" class="block px-3 py-2 rounded-md text-white hover:bg-indigo-800">
-          {{ category.title }}
-        </a>
-      {% endfor %}
-      <a href="{% url 'cart' %}" class="block px-3 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
-        🛒 Cart
-      </a>
-    </div>
-  </div>
-</nav>
+        </div>
+  </nav>
+</div>
 
 <script>
-  // Initialize Vue on the navbar element
-  Vue.createApp({
+const navbarApp = Vue.createApp({
+    delimiters: ['[[', ']]'],
     data() {
-      return { isOpen: false }
+        return {
+            isOpen: false,
+            numItems: 0
+        }
+    },
+    mounted() {
+        fetch('/api/cart_count/')
+            .then(res => res.json())
+            .then(data => this.numItems = data.count)
+            .catch(err => console.error(err))
     }
-  }).mount('#navbar')
+})
+
+navbarApp.mount('#navbarApp')
 </script>

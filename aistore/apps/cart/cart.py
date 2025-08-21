@@ -49,9 +49,7 @@ class Cart(object):
         self.session.modified = True
 
     def get_total_length(self):
-        print("get_total_length",sum(int(item['quantity']) for item in self.cart.values()))
         return sum(int(item['quantity']) for item in self.cart.values())
 
     def get_total_cost(self):
-        print('get_total_cost')
         return sum(float(item['price']) * int(item['quantity']) for item in self.cart.values())

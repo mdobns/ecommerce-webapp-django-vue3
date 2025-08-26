@@ -7,7 +7,7 @@ class Order(models.Model):
     email = models.CharField(max_length=50)
     address = models.CharField(max_length=50)
     zipcode = models.CharField(max_length=50)
-    palce = models.CharField(max_length=50)
+    place = models.CharField(max_length=50)
 
     created_at = models.DateTimeField( auto_now_add=True)
     paid = models.BooleanField(default=False)
@@ -22,3 +22,6 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, related_name='items', on_delete=models.DO_NOTHING)
     price =models.FloatField()
     quantity = models.IntegerField(default=1)
+
+    def __str__(self):
+        return '%s' % self.id

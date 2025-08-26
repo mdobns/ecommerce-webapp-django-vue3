@@ -1,8 +1,36 @@
 from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, redirect
 from apps.cart.cart import Cart
+from apps.order.utils import checkout as create_order
+from apps.order.models import Order,OrderItem
 from .models import Product
 import json 
+
+def checkout(request):
+    cart= Cart(request)
+    data = json.loads(request.body)
+    jsonresponse ={'success': True}
+
+    first_name = data['first_name'] 
+    last_name= data['last_name'] 
+    email= data['email'] 
+    address= data['address'] 
+    zipcode= data['zipcode'] 
+    place= data['place'] 
+
+    orderid = create_order(request, first_name, last_name, email, address, zipcode, place)
+
+    paid = True
+
+    if paid == True:
+        order= Order.objects.get(pk= orderid)
+        order.paid = True
+        order.paid_amount = cart.get_total_cost()
+        order.save()
+
+        cart.clear()
+    return JsonResponse({'success': True, 'order_id': orderid})
+
 
 def api_add_to_cart(request):
     data = json.loads(request.body)

@@ -7,7 +7,7 @@
     <h1 class="text-3xl font-bold text-white mb-6">🛒 Your Cart</h1>
 
 {% if cart %}
-    
+    <div v-if="products.length >0 ">
     <table class="min-w-full divide-y divide-gray-700">
         <thead class="bg-gray-800">
             <tr>
@@ -139,9 +139,9 @@
 </form>
 
 </div>
+<p class="text-gray-400 text-lg"  v-else >Your cart is empty!</p>
 
-
-
+</div>
 
 {% else %}
 <p class="text-gray-400 text-lg">Your cart is empty!</p>

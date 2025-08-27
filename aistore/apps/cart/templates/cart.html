@@ -140,7 +140,14 @@
 
 </div>
 <p class="text-gray-400 text-lg"  v-else >Your cart is empty!</p>
-
+<div class="mt-6 p-4 bg-gray-800 rounded-lg shadow-md flex justify-between items-center">
+    <span class="text-lg font-bold">Total Items: [[ totalQuantity ]]</span>
+    <span class="text-xl font-bold text-green-400">[[ totalCost ]]৳</span>
+    <button @click="buy()"
+            class="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition">
+        Check out with Stripe
+    </button>
+</div>
 </div>
 
 {% else %}
@@ -151,18 +158,19 @@
 {% endblock %}
 
 {% block script %}
+<script type="application/javascript" src="https://js.stripe.com/v3/"></script>
 <script>
 const productapp = Vue.createApp({
     delimiters: ['[[', ']]'],
     store: store,
     computed: {
-    totalQuantity() {
-        return this.products.reduce((sum, p) => sum + p.quantity, 0);
+        totalQuantity() {
+            return this.products.reduce((sum, p) => sum + p.quantity, 0);
+        },
+        totalCost() {
+            return this.products.reduce((sum, p) => sum + p.total_cost, 0);
+        }
     },
-    totalCost() {
-        return this.products.reduce((sum, p) => sum + p.total_cost, 0);
-    }
-  },
     data() {
         return {
             first_name: '',
@@ -170,11 +178,26 @@ const productapp = Vue.createApp({
             email: '',
             address: '',
             zipcode: '',
-            place: '',   // also fix typo "palce"
-            products: {{ products_json | safe }}
+            place: '',
+            products: {{ products_json|safe }}
         }
     },
     methods: {
+        buy() {
+            var stripe = Stripe('{{ pub_key }}');
+            fetch("/api/create_checkout_session/", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                credentials: 'same-origin',
+            })
+            .then(response => response.json())
+            .then(session => stripe.redirectToCheckout({ sessionId: session.id }))
+            .then(result => { if(result.error){ alert(result.error.message) } })
+            .catch(error => console.log("Error:", error));
+        },
         submitForm() {
 
         var data = {
@@ -189,23 +212,24 @@ const productapp = Vue.createApp({
         console.log(data);
 
         alert("Submit clicked!");
-        fetch('/api/checkout/', {   
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'   
-                },
-                credentials: 'same-origin',  
-                body: JSON.stringify(data)   
-            })
-            .then(response => {
-                console.log("Success")
-                console.log(response)
-                window.location.href= ('/')
-            })
-            .catch(error => {
-                console.error('Error:', error)
-            })
+        fetch('/api/checkout/', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': '{{ csrf_token }}'
+    },
+    credentials: 'same-origin',
+    body: JSON.stringify(data)
+})
+.then(res => res.json())
+.then(data => {
+    if (data.success) {
+        window.location.href = `/order/success/${data.order_id}/`;
+    } else {
+        alert("Checkout failed!");
+    }
+})
+.catch(error => console.error('Error:', error));
 
     },
 

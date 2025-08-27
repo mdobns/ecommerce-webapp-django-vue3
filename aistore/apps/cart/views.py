@@ -1,6 +1,9 @@
+import secrets
 from django.shortcuts import render
+from django.conf import settings
 from apps.store.models import Product
 import json
+
 
 def cart_detail(request):
     cart = request.session.get('cart', {})
@@ -23,6 +26,11 @@ def cart_detail(request):
 
     context = {
         'cart': cart,
+        'pub_key' : settings.STRIPE_API_KEY_PUBLISHABLE,
         'products_json': json.dumps(products_in_cart)
     }
     return render(request, 'cart.html', context)
+
+
+def success(request):
+    return render(request , 'success.html')

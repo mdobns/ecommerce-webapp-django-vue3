@@ -5,6 +5,45 @@ from apps.order.utils import checkout as create_order
 from apps.order.models import Order,OrderItem
 from .models import Product
 import json 
+import stripe
+from django.conf import settings
+
+
+stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
+
+
+def create_checkout_session(request):
+    cart = Cart(request)
+
+    items = []
+
+    for item in cart:
+        product = item['product']
+        print(product)
+        obj = {
+            'price_data': {
+                'currency': 'usd',
+                'product_data': {
+                    'name': product.title,
+                },
+                'unit_amount': int(product.price ),  # convert dollars to cents
+            },
+            'quantity': item['quantity'],
+        }
+        items.append(obj)
+
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=items,
+            mode='payment',
+            success_url='http://127.0.0.1:8000/cart/success/',
+            cancel_url='http://127.0.0.1:8000/cart/',
+        )
+        return JsonResponse({'id': session.id})   # return only session ID
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+    
 
 def checkout(request):
     cart= Cart(request)

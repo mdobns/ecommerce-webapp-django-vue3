@@ -12,27 +12,40 @@ from django.conf import settings
 stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
 
 
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
+from apps.cart.cart import Cart
+from apps.order.utils import checkout as create_order
+from apps.order.models import Order
+from .models import Product
+import json
+import stripe
+from django.conf import settings
+
+stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
+
 def create_checkout_session(request):
-    cart = Cart(request)
-
-    items = []
-
-    for item in cart:
-        product = item['product']
-        print(product)
-        obj = {
-            'price_data': {
-                'currency': 'usd',
-                'product_data': {
-                    'name': product.title,
-                },
-                'unit_amount': int(product.price ),  # convert dollars to cents
-            },
-            'quantity': item['quantity'],
-        }
-        items.append(obj)
-
     try:
+        data = json.loads(request.body)
+        cart = Cart(request)
+
+        items = []
+        for item in cart:
+            product = item['product']
+            price = int(product.price*100 )  # convert to cents
+            obj = {
+                'price_data': {
+                    'currency': 'bdt',
+                    'product_data': {
+                        'name': product.title,
+                    },
+                    'unit_amount': price,
+                },
+                'quantity': item['quantity'],
+            }
+            items.append(obj)
+
+     
         session = stripe.checkout.Session.create(
             payment_method_types=['card'],
             line_items=items,
@@ -40,10 +53,25 @@ def create_checkout_session(request):
             success_url='http://127.0.0.1:8000/cart/success/',
             cancel_url='http://127.0.0.1:8000/cart/',
         )
-        return JsonResponse({'id': session.id})   # return only session ID
+
+  
+        first_name = data['first_name']
+        last_name = data['last_name']
+        email = data['email']
+        address = data['address']
+        zipcode = data['zipcode']
+        place = data['place']
+
+        orderid = create_order(request, first_name, last_name, email, address, zipcode, place)
+        order = Order.objects.get(pk=orderid)
+        order.payment_intent = session.id
+        order.paid = False  
+        order.paid_amount = cart.get_total_cost()
+        order.save()
+        return JsonResponse({'id': session.id})
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
-    
+
 
 def checkout(request):
     cart= Cart(request)

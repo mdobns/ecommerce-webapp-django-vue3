@@ -2,157 +2,142 @@
 {% block title %}Cart | {% endblock %}
 {% block content %}
 <div id="cartapp" class="max-w-4xl mx-auto bg-gray-900 rounded-2xl shadow-lg p-8 text-gray-200">
-    
+
     <!-- Page Title -->
     <h1 class="text-3xl font-bold text-white mb-6">🛒 Your Cart</h1>
 
-{% if cart %}
+    {% if cart %}
     <div v-if="products.length >0 ">
-    <table class="min-w-full divide-y divide-gray-700">
-        <thead class="bg-gray-800">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Quantity</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Action</th>
-            </tr>
-        </thead>
-        
-        <tbody class="bg-gray-900 divide-y divide-gray-700">
-            <tr v-for="product in products" :key="product.id">
-                <td class="px-6 py-4 whitespace-nowrap">[[ product.title ]]</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <button class="px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600" @click="decrementQuantity(product.id, product.quantity)">-</button>
-                    [[ product.quantity ]]
-                    <button class="px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600" @click="incrementQuantity(product.id, product.quantity)">+</button>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">[[ product.total_cost ]]৳</td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                    <button @click="removeFromCart(product.id)"
-                            class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg shadow-md hover:scale-105 transform transition">
-                        ❌ Remove
-                    </button>
-                </td>
-            </tr>
-        </tbody>
+        <table class="min-w-full divide-y divide-gray-700">
+            <thead class="bg-gray-800">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Quantity
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Action
+                    </th>
+                </tr>
+            </thead>
 
-    </table>
+            <tbody class="bg-gray-900 divide-y divide-gray-700">
+                <tr v-for="product in products" :key="product.id">
+                    <td class="px-6 py-4 whitespace-nowrap">[[ product.title ]]</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button class="px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
+                            @click="decrementQuantity(product.id, product.quantity)">-</button>
+                        [[ product.quantity ]]
+                        <button class="px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
+                            @click="incrementQuantity(product.id, product.quantity)">+</button>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">[[ product.total_cost ]]৳</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <button @click="removeFromCart(product.id)"
+                            class="px-4 py-2 bg-gradient-to-r from-red-500 to-pink-600 text-white rounded-lg shadow-md hover:scale-105 transform transition">
+                            ❌ Remove
+                        </button>
+                    </td>
+                </tr>
+            </tbody>
+
+        </table>
+        <div class="mt-6 p-4 bg-gray-800 rounded-lg shadow-md flex justify-between items-center">
+            <span class="text-lg font-bold">Total Items: [[ totalQuantity ]]</span>
+            <span class="text-xl font-bold text-green-400">[[ totalCost ]]৳</span>
+        </div>
+
+
+
+        <form @submit.prevent="submitForm()" class="bg-gray-800 p-6 rounded-xl shadow-md mt-6">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- First Name -->
+                <div>
+                    <label class="block text-gray-200 mb-1">First Name</label>
+                    <input type="text" name="first_name" v-model="first_name" placeholder="Enter your first name" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                </div>
+
+                <!-- Last Name -->
+                <div>
+                    <label class="block text-gray-200 mb-1">Last Name</label>
+                    <input type="text" name="last_name" v-model="last_name" placeholder="Enter your last name" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                </div>
+
+                <!-- Email -->
+                <div class="md:col-span-2">
+                    <label class="block text-gray-200 mb-1">Email</label>
+                    <input type="email" name="email" v-model="email" placeholder="example@email.com" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                </div>
+
+                <!-- Address -->
+                <div class="md:col-span-2">
+                    <label class="block text-gray-200 mb-1">Address</label>
+                    <input type="text" name="address" v-model="address" placeholder="Street address" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                </div>
+
+                <!-- Zip Code -->
+                <div>
+                    <label class="block text-gray-200 mb-1">Zip Code</label>
+                    <input type="number" name="zipcode" v-model="zipcode" placeholder="12345" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                </div>
+
+                <!-- Place -->
+                <div>
+                    <label class="block text-gray-200 mb-1">Place</label>
+                    <input type="text" name="place" v-model="place" placeholder="City / Town" class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
+               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400" />
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div class="flex justify-center mt-6">
+                <button type="submit" class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md 
+             hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 
+             focus:ring-offset-1 transition">
+                    Checkout
+                </button>
+            </div>
+        </form>
+
+    </div>
+    <p class="text-gray-400 text-lg" v-else>Your cart is empty!</p>
     <div class="mt-6 p-4 bg-gray-800 rounded-lg shadow-md flex justify-between items-center">
         <span class="text-lg font-bold">Total Items: [[ totalQuantity ]]</span>
         <span class="text-xl font-bold text-green-400">[[ totalCost ]]৳</span>
-    </div>
-
-
-
-<form @submit.prevent="submitForm()" class="bg-gray-800 p-6 rounded-xl shadow-md mt-6">
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-    <!-- First Name -->
-    <div>
-      <label class="block text-gray-200 mb-1">First Name</label>
-      <input 
-        type="text" 
-        name="first_name" 
-        v-model="first_name"
-        placeholder="Enter your first name"
-        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-      />
-    </div>
-
-    <!-- Last Name -->
-    <div>
-      <label class="block text-gray-200 mb-1">Last Name</label>
-      <input 
-        type="text" 
-        name="last_name" 
-        v-model="last_name"
-        placeholder="Enter your last name"
-        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-      />
-    </div>
-
-    <!-- Email -->
-    <div class="md:col-span-2">
-      <label class="block text-gray-200 mb-1">Email</label>
-      <input 
-        type="email" 
-        name="email" 
-        v-model="email"
-        placeholder="example@email.com"
-        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-      />
-    </div>
-
-    <!-- Address -->
-    <div class="md:col-span-2">
-      <label class="block text-gray-200 mb-1">Address</label>
-      <input 
-        type="text" 
-        name="address" 
-        v-model="address"
-        placeholder="Street address"
-        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-      />
-    </div>
-
-    <!-- Zip Code -->
-    <div>
-      <label class="block text-gray-200 mb-1">Zip Code</label>
-      <input 
-        type="number" 
-        name="zipcode" 
-        v-model="zipcode"
-        placeholder="12345"
-        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-      />
-    </div>
-
-    <!-- Place -->
-    <div>
-      <label class="block text-gray-200 mb-1">Place</label>
-      <input 
-        type="text" 
-        name="place" 
-        v-model="place"
-        placeholder="City / Town"
-        class="w-full px-4 py-2 bg-gray-700 text-white rounded-lg border border-gray-600 
-               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 placeholder-gray-400"
-      />
-    </div>
-  </div>
-
-  <!-- Submit Button -->
-  <div class="flex justify-center mt-6">
-    <button 
-      type="submit"
-      class="px-6 py-2 bg-blue-600 text-white font-semibold rounded-lg shadow-md 
-             hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 
-             focus:ring-offset-1 transition"
-    >
-      Checkout
-    </button>
-  </div>
-</form>
-
-</div>
-<p class="text-gray-400 text-lg"  v-else >Your cart is empty!</p>
-<div class="mt-6 p-4 bg-gray-800 rounded-lg shadow-md flex justify-between items-center">
-    <span class="text-lg font-bold">Total Items: [[ totalQuantity ]]</span>
-    <span class="text-xl font-bold text-green-400">[[ totalCost ]]৳</span>
-    <button @click="buy()"
+        <button @click="buy()"
             class="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition">
-        Check out with Stripe
-    </button>
+            Check out with Stripe
+        </button>
+    </div>
+    
+<div v-if="errors.length>0" class="space-y-3 mt-4">
+    <article v-for="(error, index) in errors" :key="index"
+        class="border-l-4 border-red-500 bg-red-50 rounded-lg shadow-sm p-4">
+        <div class="flex items-center mb-2">
+            <p class="text-red-700 font-semibold text-sm uppercase">Error</p>
+        </div>
+        <div class="text-red-600 text-sm">
+            <p>[[ error ]]</p>
+        </div>
+    </article>
 </div>
+
 </div>
+
 
 {% else %}
 <p class="text-gray-400 text-lg">Your cart is empty!</p>
 {% endif %}
+
+
+
+
 </div>
 
 {% endblock %}
@@ -160,109 +145,141 @@
 {% block script %}
 <script type="application/javascript" src="https://js.stripe.com/v3/"></script>
 <script>
-const productapp = Vue.createApp({
-    delimiters: ['[[', ']]'],
-    store: store,
-    computed: {
-        totalQuantity() {
-            return this.products.reduce((sum, p) => sum + p.quantity, 0);
+    const productapp = Vue.createApp({
+        delimiters: ['[[', ']]'],
+        store: store,
+        computed: {
+            totalQuantity() {
+                return this.products.reduce((sum, p) => sum + p.quantity, 0);
+            },
+            totalCost() {
+                return this.products.reduce((sum, p) => sum + p.total_cost, 0);
+            }
         },
-        totalCost() {
-            return this.products.reduce((sum, p) => sum + p.total_cost, 0);
-        }
-    },
-    data() {
-        return {
-            first_name: '',
-            last_name: '',
-            email: '',
-            address: '',
-            zipcode: '',
-            place: '',
-            products: {{ products_json|safe }}
-        }
+        data() {
+            return {
+                errors: [],
+                first_name: '',
+                last_name: '',
+                email: '',
+                address: '',
+                zipcode: '',
+                place: '',
+                products: {{ products_json | safe }}
+            }
     },
     methods: {
         buy() {
-            var stripe = Stripe('{{ pub_key }}');
-            fetch("/api/create_checkout_session/", {
+            var data = {
+                first_name: this.first_name,
+                last_name: this.last_name,
+                email: this.email,
+                address: this.address,
+                zipcode: this.zipcode,
+                place: this.place
+            };
+            this.errors = [];
+            if (!data.first_name) this.errors.push("First name is required");
+            if (!data.last_name) this.errors.push("Last name is required");
+            if (!data.email) this.errors.push("Email is required");
+            if (!data.address) this.errors.push("Address is required");
+            if (!data.zipcode) this.errors.push("Zipcode is required");
+            if (!data.place) this.errors.push("Place is required");
+
+            if (this.errors.length === 0) {
+                var stripe = Stripe('{{ pub_key }}');
+                fetch("/api/create_checkout_session/", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}'
+                    },
+                    credentials: 'same-origin',
+                    body: JSON.stringify(data)
+                })
+                     .then(function(response) {
+                            return response.json()
+                        })
+                        .then(function(session) {
+                            return stripe.redirectToCheckout({ sessionId: session.id })
+                        })
+                        .then(function(result) {
+                            if (result.error) {
+                                alert(result.error.message)
+                            }
+                        })
+                        .catch(function(error) {
+                            console.log('Error:', error);
+                        });
+                
+
+            }
+            },
+        submitForm() {
+
+            var data = {
+                first_name: this.first_name,
+                last_name: this.last_name,
+                email: this.email,
+                address: this.address,
+                zipcode: this.zipcode,
+                place: this.place
+            };
+
+            console.log(data);
+
+            alert("Submit clicked!");
+            fetch('/api/checkout/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'X-CSRFToken': '{{ csrf_token }}'
                 },
                 credentials: 'same-origin',
+                body: JSON.stringify(data)
             })
-            .then(response => response.json())
-            .then(session => stripe.redirectToCheckout({ sessionId: session.id }))
-            .then(result => { if(result.error){ alert(result.error.message) } })
-            .catch(error => console.log("Error:", error));
+                .then(res => res.json())
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = `/order/success/${data.order_id}/`;
+                    } else {
+                        alert("Checkout failed!");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+
         },
-        submitForm() {
-
-        var data = {
-            first_name: this.first_name,
-            last_name: this.last_name,
-            email: this.email,
-            address: this.address,
-            zipcode: this.zipcode,
-            place: this.place
-        };
-
-        console.log(data);
-
-        alert("Submit clicked!");
-        fetch('/api/checkout/', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'X-CSRFToken': '{{ csrf_token }}'
-    },
-    credentials: 'same-origin',
-    body: JSON.stringify(data)
-})
-.then(res => res.json())
-.then(data => {
-    if (data.success) {
-        window.location.href = `/order/success/${data.order_id}/`;
-    } else {
-        alert("Checkout failed!");
-    }
-})
-.catch(error => console.error('Error:', error));
-
-    },
 
         incrementQuantity(product_id, quantity){
             const data = {
-            product_id: product_id,
-            update: true,
-            quantity: quantity + 1
-        }
-        this.$store.commit('increment', 1)
+                product_id: product_id,
+                update: true,
+                quantity: quantity + 1
+            }
+            this.$store.commit('increment', 1)
 
-        fetch('/api/add_to_cart/', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRFToken': '{{ csrf_token }}'
-            },
-            credentials: 'same-origin',
-            body: JSON.stringify(data)
-        })
-        .then(response => {
-            this.products = this.products.map(product => {
-                if (product.id === product_id) {
-                    return { 
-                        ...product, 
-                        quantity: product.quantity + 1, 
-                        total_cost: (product.quantity + 1) * product.price 
-                    };
-                }
-            return product;
+            fetch('/api/add_to_cart/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
             })
-        })
-        .catch(error => console.error('Error:', error))
+                .then(response => {
+                    this.products = this.products.map(product => {
+                        if (product.id === product_id) {
+                            return {
+                                ...product,
+                                quantity: product.quantity + 1,
+                                total_cost: (product.quantity + 1) * product.price
+                            };
+                        }
+                        return product;
+                    })
+                })
+                .catch(error => console.error('Error:', error))
         },
 
         decrementQuantity(product_id, quantity){
@@ -281,31 +298,31 @@ const productapp = Vue.createApp({
                 credentials: 'same-origin',
                 body: JSON.stringify(data)
             })
-            .then(response => {
-                this.products = this.products.map(product => {
-                    if (product.id === product_id) {
-                        const newQuantity = product.quantity - 1;
-                        if (newQuantity <= 0) {
-                            // remove the product from products array
-                            this.$store.commit('decrement', product.quantity); // decrement by the full quantity removed
-                            return null;
+                .then(response => {
+                    this.products = this.products.map(product => {
+                        if (product.id === product_id) {
+                            const newQuantity = product.quantity - 1;
+                            if (newQuantity <= 0) {
+                                // remove the product from products array
+                                this.$store.commit('decrement', product.quantity); // decrement by the full quantity removed
+                                return null;
+                            }
+                            return {
+                                ...product,
+                                quantity: newQuantity,
+                                total_cost: newQuantity * product.price
+                            };
                         }
-                        return { 
-                            ...product, 
-                            quantity: newQuantity,
-                            total_cost: newQuantity * product.price
-                        };
+                        return product;
+                    }).filter(Boolean); // remove nulls
+                    // if product was removed, cart count already updated above
+                    if (quantity === 1) {
+                        // already removed, nothing else needed
+                    } else {
+                        this.$store.commit('decrement', 1);
                     }
-                    return product;
-                }).filter(Boolean); // remove nulls
-                // if product was removed, cart count already updated above
-                if (quantity === 1) {
-                    // already removed, nothing else needed
-                } else {
-                    this.$store.commit('decrement', 1);
-                }
-            })
-            .catch(error => console.error('Error:', error))
+                })
+                .catch(error => console.error('Error:', error))
         },
 
 
@@ -315,35 +332,35 @@ const productapp = Vue.createApp({
 
             var data = { 'product_id': product_id }
 
-            fetch('/api/remove_from_cart/', {   
+            fetch('/api/remove_from_cart/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'   
+                    'X-CSRFToken': '{{ csrf_token }}'
                 },
-                credentials: 'same-origin',  
-                body: JSON.stringify(data)   
+                credentials: 'same-origin',
+                body: JSON.stringify(data)
             })
-            .then(response => {
-                console.log(response)
-                // Remove product from local array
-                this.products = this.products.filter(p => p.id !== product_id)
-                
-                // Update Vuex store count
-                if (this.products.length === 0) {
-                    this.$store.commit('setCount', 0) // set to 0 explicitly
-                } else {
-                    this.$store.commit('decrement', product.quantity)
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error)
-            })
-        }   
+                .then(response => {
+                    console.log(response)
+                    // Remove product from local array
+                    this.products = this.products.filter(p => p.id !== product_id)
+
+                    // Update Vuex store count
+                    if (this.products.length === 0) {
+                        this.$store.commit('setCount', 0) // set to 0 explicitly
+                    } else {
+                        this.$store.commit('decrement', product.quantity)
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error)
+                })
+        }
 
     }
 })
-productapp.use(store)
-productapp.mount("#cartapp")
+    productapp.use(store)
+    productapp.mount("#cartapp")
 </script>
 {% endblock %}

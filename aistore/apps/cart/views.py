@@ -3,15 +3,17 @@ from django.shortcuts import render
 from django.conf import settings
 from apps.store.models import Product
 import json
+from .cart import Cart
 
 
 def cart_detail(request):
-    cart = request.session.get('cart', {})
+    # cart = request.session.get('cart', {})
+    cart = Cart(request)
     products_in_cart = []
 
-    for product_id, item in cart.items():  # item is the dict
+    for item in cart:  # item is the dict
         try:
-            product = Product.objects.get(id=product_id)
+            product = Product.objects.get(id=item['id'])
         except Product.DoesNotExist:
             continue
 
@@ -33,4 +35,6 @@ def cart_detail(request):
 
 
 def success(request):
+    cart = Cart(request)
+    cart.clear()
     return render(request , 'success.html')

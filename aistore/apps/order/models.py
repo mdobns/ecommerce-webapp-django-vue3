@@ -10,8 +10,12 @@ class Order(models.Model):
     place = models.CharField(max_length=50)
 
     created_at = models.DateTimeField( auto_now_add=True)
+
     paid = models.BooleanField(default=False)
     paid_amount = models.FloatField(blank= True, null=True)
+
+    payment_intent = models.CharField(max_length=255)
+
 
 
     def __str__(self):

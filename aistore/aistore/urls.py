@@ -18,6 +18,7 @@ from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
 from django.urls import path
+from apps.cart.webhook import webhook
 from apps.cart.views import cart_detail, success
 from apps.core.views import frontpage , contact , about
 from apps.store.views import product_detail,category_detail
@@ -28,6 +29,7 @@ urlpatterns = [
     path('', frontpage, name= 'frontpage'),
     path('admin/', admin.site.urls),
     path("cart/", cart_detail, name="cart"),
+    path("hooks/", webhook, name="webhook"),
     path("cart/success/", success, name="success"),
     path("contact/", contact, name= 'contact'),
     path("about/", about, name= 'about'),

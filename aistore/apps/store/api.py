@@ -1,3 +1,5 @@
+# Run this in your terminal to forward Stripe webhooks:
+# stripe listen --forward-to localhost:8000/hooks/
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect
 from apps.cart.cart import Cart

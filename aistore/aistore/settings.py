@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'apps.store',
     'apps.order',
     'stripe',
+    'apps.coupon',
 ]
 
 MIDDLEWARE = [

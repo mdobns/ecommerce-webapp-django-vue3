@@ -1,21 +1,26 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{% block title %}{% endblock %} Ai Shop</title>
-  
+
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
   <link rel="stylesheet" href="{% static 'main.css' %}">
 
 </head>
+
 <body class="bg-gray-950 text-gray-200 font-sans">
+  <script>
+    window.activeCategory = "{{ active_category|default:'' }}";
+  </script>
 
   <!-- Navbar Partial -->
- 
+
   <nav id="navbarApp" class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
@@ -23,38 +28,66 @@
         <a href="{% url 'frontpage' %}" class="text-2xl font-bold tracking-wide text-white">
           <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Ai Shop</span>
         </a>
+        <!-- Search Bar -->
+        <form class="w-full max-w-xs sm:max-w-md mx-auto">
+          <label for="default-search"
+            class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-2 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
+              </svg>
+            </div>
+            <input type="search" id="default-search"
+              class="block w-full p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+              placeholder="Search products..." required />
+            <button type="submit"
+              class="text-white absolute end-2 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+          </div>
+        </form>
+
         <!-- Hamburger Button (Mobile) -->
         <button @click="isOpen = !isOpen" class="md:hidden text-white focus:outline-none">
-          <svg v-if="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          <svg v-if="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
           </svg>
-          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+
+
+
+
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-6 items-center">
           {% for category in menu_categories %}
-            <a href="{% url 'category_detail' category.slug %}" class="hover:text-cyan-400 transition">
-              {{ category.title }}
-            </a>
-          {% endfor %}
-          <a href="{% url 'cart' %}" 
-            class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
-            🛒 Cart <span>([[ numItems ]])</span>
+          <a href="{% url 'category_detail' category.slug %}"
+            class="block px-4 py-2 text-white hover:bg-indigo-600 rounded-xl transition {% if category.slug == active_category %}block px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl shadow-md hover:scale-105 transform transition{% endif %}">
+            {{ category.title }}
           </a>
+          {% endfor %}
+          <a href="{% url 'cart' %}"
+   class="flex items-center h-10 px-2 sm:px-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition whitespace-nowrap">
+   🛒 Cart <span class="ml-2">([[ numItems ]])</span>
+</a>
         </div>
       </div>
       <!-- Mobile Menu -->
-  <div v-if="isOpen" class="md:hidden flex flex-col space-y-2 mt-2 mb-8">
+      <div v-if="isOpen" class="md:hidden flex flex-col space-y-2 mt-2 mb-8">
         {% for category in menu_categories %}
-          <a href="{% url 'category_detail' category.slug %}" class="block px-4 py-2 text-white hover:bg-indigo-600 rounded transition">
-            {{ category.title }}
-          </a>
+        <a href="{% url 'category_detail' category.slug %}"
+          class="block px-4 py-2 text-white hover:bg-indigo-600 rounded transition">
+          {{ category.title }}
+        </a>
         {% endfor %}
-        <a href="{% url 'cart' %}" 
-           class="block px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
-           🛒 Cart <span>([[ numItems ]])</span>
+        <a href="{% url 'cart' %}"
+          class="block px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
+          🛒 Cart <span>([[ numItems ]])</span>
         </a>
       </div>
     </div>
@@ -85,52 +118,58 @@
 
 
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
-<script src="https://unpkg.com/vuex@4.0.2/dist/vuex.global.js"></script>
-<script>
-const store = Vuex.createStore({
-  state() {
-    return {
-            numItems: parseInt("{{ cart_count|default:'0' }}"),
-    }
-  },
-  mutations: {
-    setCount(state, count) {
-      state.numItems = count
-    },
-    increment(state, qty) {
-      state.numItems += qty
-    },
-    decrement(state, qty) {
-      state.numItems -= qty
-    }
-  }
-});
+  <script src="https://unpkg.com/vuex@4.0.2/dist/vuex.global.js"></script>
+  <script>
+    const store = Vuex.createStore({
+      state() {
+        return {
+          numItems: parseInt("{{ cart_count|default:'0' }}"),
 
-const navbarApp = Vue.createApp({
-  delimiters: ['[[', ']]'],
-  data() {
-    return {
-      isOpen: false
-    }
-  },
-  computed: {
-    numItems() {
-      return this.$store.state.numItems
-    }
-  },
-  mounted() {
-    // Fetch cart count from API for live update
-    fetch('/api/cart_count/')
-      .then(res => res.json())
-      .then(data => this.$store.commit('setCount', data.count))
-      .catch(err => console.error(err));
-  }
-});
+        }
+      },
+      mutations: {
+        setCount(state, count) {
+          state.numItems = count
+        },
+        increment(state, qty) {
+          state.numItems += qty
+        },
+        decrement(state, qty) {
+          state.numItems -= qty
+        }
+      }
+    });
 
-navbarApp.use(store);
-navbarApp.mount('#navbarApp');
-</script>
+    const navbarApp = Vue.createApp({
+      delimiters: ['[[', ']]'],
+      data() {
+        return {
+          isOpen: false,
+          activeCategory: window.activeCategory || null
+
+        }
+      },
+      computed: {
+        numItems() {
+          return this.$store.state.numItems
+        }
+      },
+      mounted() {
+        console.log(this.activeCategory); // <-- Move here
+
+        // Fetch cart count from API for live update
+        fetch('/api/cart_count/')
+          .then(res => res.json())
+          .then(data => this.$store.commit('setCount', data.count))
+          .catch(err => console.error(err));
+      }
+    });
+
+    navbarApp.use(store);
+    navbarApp.mount('#navbarApp');
+  </script>
   {% block script %}
   {% endblock %}
 </body>
+
 </html>

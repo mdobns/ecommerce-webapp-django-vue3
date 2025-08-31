@@ -9,32 +9,31 @@ from .models import Product
 import json 
 import stripe
 from django.conf import settings
-
-
-stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
-
-
-from django.http import JsonResponse
-from django.shortcuts import get_object_or_404
-from apps.cart.cart import Cart
-from apps.order.utils import checkout as create_order
-from apps.order.models import Order
-from .models import Product
-import json
-import stripe
-from django.conf import settings
+from apps.coupon.models import Coupon
 
 stripe.api_key = settings.STRIPE_API_KEY_HIDDEN
+
 
 def create_checkout_session(request):
     try:
         data = json.loads(request.body)
+        coupon_code = data['coupon_code']
+        coupon_value = 0
+        if coupon_code != '':
+            coupon = Coupon.objects.get(code=coupon_code)
+            if coupon.is_valid():
+                coupon_value = coupon.discount
+                coupon.use()
+            
         cart = Cart(request)
 
         items = []
         for item in cart:
             product = item['product']
             price = int(product.price*100 )  # convert to cents
+            if coupon_value > 0:
+                discount_amount = int((coupon_value / 100) * price)
+                price -= discount_amount
             obj = {
                 'price_data': {
                     'currency': 'bdt',
@@ -68,7 +67,20 @@ def create_checkout_session(request):
         order = Order.objects.get(pk=orderid)
         order.payment_intent = session.id
         order.paid = False  
-        order.paid_amount = cart.get_total_cost()
+
+        total_cost = 0
+        for item in cart:
+            product = item['product']
+            price = int(product.price * 100)  # cents
+            if coupon_value > 0:
+                discount_amount = int((coupon_value / 100) * price)
+                price -= discount_amount
+            total_cost += price * item['quantity']
+
+        # Stripe expects cents, but your order.paid_amount should be in main currency
+        order.paid_amount = total_cost // 100  # convert back to main currency
+# ...existing code...
+        order.used_coupon = coupon_code
         order.save()
         return JsonResponse({'id': session.id})
     except Exception as e:

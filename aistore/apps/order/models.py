@@ -2,6 +2,16 @@ from django.db import models
 from apps.store.models import * 
 
 class Order(models.Model):
+    ORDERED = 'Ordered'
+    SHIPPED = 'Shipped'
+    ARRIVED = 'Arrived'
+    CANCELED = 'Canceled'
+    CHOICES = [
+        (ORDERED, 'Ordered'),
+        (SHIPPED, 'Shipped'),
+        (ARRIVED, 'Arrived'),
+        (CANCELED, 'Canceled'),
+    ]
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     email = models.CharField(max_length=50)
@@ -16,6 +26,9 @@ class Order(models.Model):
     used_coupon = models.CharField(max_length=50, blank=True, null=True)
 
     payment_intent = models.CharField(max_length=255)
+    
+    shipped_date = models.DateTimeField(blank=True, null=True)
+    status = models.CharField(max_length=50, choices=CHOICES, default=ORDERED) 
 
 
 

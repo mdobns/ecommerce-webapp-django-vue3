@@ -16,15 +16,22 @@
 
   <!-- Navbar Partial -->
  
-  <nav class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 shadow-lg">
+  <nav id="navbarApp" class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 shadow-lg">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex justify-between h-16 items-center">
-
         <!-- Logo -->
         <a href="{% url 'frontpage' %}" class="text-2xl font-bold tracking-wide text-white">
           <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Ai Shop</span>
         </a>
-
+        <!-- Hamburger Button (Mobile) -->
+        <button @click="isOpen = !isOpen" class="md:hidden text-white focus:outline-none">
+          <svg v-if="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-6 items-center">
           {% for category in menu_categories %}
@@ -34,12 +41,23 @@
           {% endfor %}
           <a href="{% url 'cart' %}" 
             class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
-            <div id="navbarApp">
-              🛒 Cart ([[ numItems ]])
-            </div>
+            🛒 Cart <span>([[ numItems ]])</span>
           </a>
-
         </div>
+      </div>
+      <!-- Mobile Menu -->
+  <div v-if="isOpen" class="md:hidden flex flex-col space-y-2 mt-2 mb-8">
+        {% for category in menu_categories %}
+          <a href="{% url 'category_detail' category.slug %}" class="block px-4 py-2 text-white hover:bg-indigo-600 rounded transition">
+            {{ category.title }}
+          </a>
+        {% endfor %}
+        <a href="{% url 'cart' %}" 
+           class="block px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
+           🛒 Cart <span>([[ numItems ]])</span>
+        </a>
+      </div>
+    </div>
   </nav>
 
 
@@ -70,42 +88,47 @@
 <script src="https://unpkg.com/vuex@4.0.2/dist/vuex.global.js"></script>
 <script>
 const store = Vuex.createStore({
-    state() {
-        return {
-            numItems: {{cart_count|default:0 }}
-        }
+  state() {
+    return {
+            numItems: parseInt("{{ cart_count|default:'0' }}"),
+    }
+  },
+  mutations: {
+    setCount(state, count) {
+      state.numItems = count
     },
-    mutations: {
-        setCount(state, count) {
-            state.numItems = count
-        },
-        increment(state, qty) {
-            state.numItems += qty
-        },
-        decrement(state, qty) {
-            state.numItems -= qty
-        }
+    increment(state, qty) {
+      state.numItems += qty
+    },
+    decrement(state, qty) {
+      state.numItems -= qty
     }
+  }
 });
-</script>
 
-<script>
 const navbarApp = Vue.createApp({
-    delimiters: ['[[', ']]'],
-    computed: {
-        numItems() {
-            return this.$store.state.numItems
-        }
+  delimiters: ['[[', ']]'],
+  data() {
+    return {
+      isOpen: false
     }
+  },
+  computed: {
+    numItems() {
+      return this.$store.state.numItems
+    }
+  },
+  mounted() {
+    // Fetch cart count from API for live update
+    fetch('/api/cart_count/')
+      .then(res => res.json())
+      .then(data => this.$store.commit('setCount', data.count))
+      .catch(err => console.error(err));
+  }
 });
 
-
-navbarApp.use(store)
-navbarApp.mount('#navbarApp')
-
-
-
-
+navbarApp.use(store);
+navbarApp.mount('#navbarApp');
 </script>
   {% block script %}
   {% endblock %}

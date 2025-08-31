@@ -1,3 +1,4 @@
+{% block navbar %}
 <!-- Navbar Partial -->
 <div id="navbarApp">
   <nav class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-blue-900 shadow-lg">
@@ -9,6 +10,16 @@
           <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Ai Shop</span>
         </a>
 
+        <!-- Mobile Toggle Button -->
+        <button @click="isOpen = !isOpen" class="md:hidden text-white focus:outline-none">
+          <svg v-if="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+          </svg>
+          <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+
         <!-- Desktop Menu -->
         <div class="hidden md:flex space-x-6 items-center">
           {% for category in menu_categories %}
@@ -18,28 +29,48 @@
           {% endfor %}
           <a href="{% url 'cart' %}" 
              class="px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
-             🛒 Cart ([[ numItems ]])
+             🛒 Cart <span id="cart-count">[[ numItems ]]</span>
           </a>
         </div>
+      </div>
+
+      <!-- Mobile Menu -->
+      <div v-if="isOpen" class="md:hidden flex flex-col space-y-2 mt-2">
+        {% for category in menu_categories %}
+          <a href="{% url 'category_detail' category.slug %}" class="block px-4 py-2 text-white hover:bg-indigo-600 rounded transition">
+            {{ category.title }}
+          </a>
+        {% endfor %}
+        <a href="{% url 'cart' %}" 
+           class="block px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
+           🛒 Cart <span id="cart-count-mobile">[[ numItems ]]</span>
+        </a>
+      </div>
+    </div>
   </nav>
 </div>
 
+<!-- Make sure Vue 3 is loaded before this script -->
+<script src="https://unpkg.com/vue@3"></script>
 <script>
-const navbarApp = Vue.createApp({
+document.addEventListener('DOMContentLoaded', function() {
+  const navbarApp = Vue.createApp({
     delimiters: ['[[', ']]'],
     data() {
-        return {
-            isOpen: false,
-            numItems: 0
-        }
+      return {
+        isOpen: false,
+        numItems: 0
+      }
     },
     mounted() {
-        fetch('/api/cart_count/')
-            .then(res => res.json())
-            .then(data => this.numItems = data.count)
-            .catch(err => console.error(err))
+      fetch('/api/cart_count/')
+        .then(res => res.json())
+        .then(data => this.numItems = data.count)
+        .catch(err => console.error(err))
     }
-})
-
-navbarApp.mount('#navbarApp')
+  });
+  navbarApp.mount('#navbarApp');
+});
 </script>
+{% endblock %}
+

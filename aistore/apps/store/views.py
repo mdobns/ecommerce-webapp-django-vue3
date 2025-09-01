@@ -11,12 +11,10 @@ def search(request):
 
 def product_detail(request, category_slug, slug):
     product = get_object_or_404(Product, slug=slug)
-    
     cart = Cart(request)
-    if cart.has_product(product.id):
-        in_cart = True
-    else:
-        in_cart = False
+    print(f"Product ID: {product.id}")
+    in_cart = cart.has_product(product.id)
+    
 
     productstring = [{
         'thumbnail': product.thumbnail.url ,
@@ -28,6 +26,7 @@ def product_detail(request, category_slug, slug):
         productstring.append({
         'thumbnail': image.thumbnail.url ,
         'image': image.image.url ,   
+        'in_cart': in_cart,
     })
 
     context = {

@@ -79,7 +79,7 @@
       <div v-if="isOpen" class="lg:hidden flex flex-col space-y-2 mt-2 mb-8">
         {% for category in menu_categories %}
         <a href="{% url 'category_detail' category.slug %}"
-          class="block px-4 py-2 text-white hover:bg-indigo-600 rounded transition">
+            class="block px-4 py-2 text-white hover:bg-indigo-600 rounded-xl transition {% if category.slug == active_category %}block px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl shadow-md hover:scale-105 transform transition{% endif %}">
           {{ category.title }}
         </a>
         {% endfor %}

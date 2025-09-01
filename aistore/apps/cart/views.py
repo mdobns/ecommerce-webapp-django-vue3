@@ -2,6 +2,7 @@ import secrets
 from django.shortcuts import render
 from django.conf import settings
 from apps.store.models import Product
+from apps.order.models import Order
 import json
 from .cart import Cart
 

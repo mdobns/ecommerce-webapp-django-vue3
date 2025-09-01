@@ -1,6 +1,8 @@
 from django.shortcuts import render,get_object_or_404
-from .models import Product,Category
+from .models import Product,Category, Image
+from apps.cart.cart import Cart
 from django.db.models import Q
+import json
 
 def search(request):
     query = request.GET.get('q', '').strip()
@@ -9,9 +11,30 @@ def search(request):
 
 def product_detail(request, category_slug, slug):
     product = get_object_or_404(Product, slug=slug)
+    
+    cart = Cart(request)
+    if cart.has_product(product.id):
+        in_cart = True
+    else:
+        in_cart = False
+
+    productstring = [{
+        'thumbnail': product.thumbnail.url ,
+        'image': product.image.url ,
+        
+    }]
+
+    for image in product.images.all():
+        productstring.append({
+        'thumbnail': image.thumbnail.url ,
+        'image': image.image.url ,   
+    })
 
     context = {
         "product": product,
+        "productstring": json.dumps(productstring),
+        "in_cart": in_cart,
+        
     }
     return render(request, 'product_detail.html', context)
 

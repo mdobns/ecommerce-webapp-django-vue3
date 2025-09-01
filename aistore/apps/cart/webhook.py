@@ -36,4 +36,8 @@ def webhook(request):
         else:
             print('No order to mark as paid')
 
+        for item in order.items.all():
+            item.product.num_available -= item.quantity
+            item.product.save()
+
     return HttpResponse(status=200)

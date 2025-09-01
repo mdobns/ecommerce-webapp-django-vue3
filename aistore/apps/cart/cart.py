@@ -22,6 +22,11 @@ class Cart(object):
             item['total_price'] = float(item['price']) * int(item['quantity'])
             yield item
 
+    def has_product(self, product_id):
+        if product_id in self.cart:
+            return True
+        return False
+    
     def clear(self):
         del self.session[settings.CART_SESSION_ID]
         self.session.modified = True

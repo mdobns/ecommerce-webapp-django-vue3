@@ -3,15 +3,14 @@
 <html lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{% block title %}{% endblock %} Ai Shop</title>
 
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <link rel="stylesheet" href="{% static 'main.css' %}">
-
+  <link rel="stylesheet" href="{% static 'main.css' %}" />
 </head>
 
 <body class="bg-gray-950 text-gray-200 font-sans">
@@ -29,7 +28,7 @@
           <span class="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">Ai Shop</span>
         </a>
         <!-- Search Bar -->
-        <form class="w-full max-w-xs sm:max-w-md mx-auto">
+        <form class="w-full max-w-xs sm:max-w-md mx-auto" @submit.prevent="search">
           <label for="default-search"
             class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
           <div class="relative">
@@ -40,16 +39,18 @@
                   d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z" />
               </svg>
             </div>
-            <input type="search" id="default-search"
-              class="block w-full p-2 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+            <input type="search" id="default-search" v-model="searchQuery"
+              class="block w-full py-2.5 ps-8 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
               placeholder="Search products..." required />
             <button type="submit"
-              class="text-white absolute end-2 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Search</button>
+              class="text-white absolute end-2 bottom-2 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xs px-3 py-1 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">
+              Search
+            </button>
           </div>
         </form>
 
         <!-- Hamburger Button (Mobile) -->
-        <button @click="isOpen = !isOpen" class="md:hidden text-white focus:outline-none">
+        <button @click="isOpen = !isOpen" class="lg:hidden text-white focus:outline-none">
           <svg v-if="!isOpen" xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
             stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
@@ -60,11 +61,8 @@
           </svg>
         </button>
 
-
-
-
         <!-- Desktop Menu -->
-        <div class="hidden md:flex space-x-6 items-center">
+        <div class="hidden lg:flex space-x-6 items-center">
           {% for category in menu_categories %}
           <a href="{% url 'category_detail' category.slug %}"
             class="block px-4 py-2 text-white hover:bg-indigo-600 rounded-xl transition {% if category.slug == active_category %}block px-4 py-2 bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-xl shadow-md hover:scale-105 transform transition{% endif %}">
@@ -72,13 +70,13 @@
           </a>
           {% endfor %}
           <a href="{% url 'cart' %}"
-   class="flex items-center h-10 px-2 sm:px-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition whitespace-nowrap">
-   🛒 Cart <span class="ml-2">([[ numItems ]])</span>
-</a>
+            class="flex items-center h-10 px-2 sm:px-4 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition whitespace-nowrap">
+            🛒 Cart <span class="ml-2">([[ numItems ]])</span>
+          </a>
         </div>
       </div>
       <!-- Mobile Menu -->
-      <div v-if="isOpen" class="md:hidden flex flex-col space-y-2 mt-2 mb-8">
+      <div v-if="isOpen" class="lg:hidden flex flex-col space-y-2 mt-2 mb-8">
         {% for category in menu_categories %}
         <a href="{% url 'category_detail' category.slug %}"
           class="block px-4 py-2 text-white hover:bg-indigo-600 rounded transition">
@@ -93,11 +91,9 @@
     </div>
   </nav>
 
-
   <!-- Page Content -->
   <section class="max-w-7xl mx-auto px-6 py-10">
-    {% block content %}
-    {% endblock %}
+    {% block content %} {% endblock %}
   </section>
 
   <!-- Footer -->
@@ -116,7 +112,6 @@
     </div>
   </footer>
 
-
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <script src="https://unpkg.com/vuex@4.0.2/dist/vuex.global.js"></script>
   <script>
@@ -124,52 +119,55 @@
       state() {
         return {
           numItems: parseInt("{{ cart_count|default:'0' }}"),
-
-        }
+        };
       },
       mutations: {
         setCount(state, count) {
-          state.numItems = count
+          state.numItems = count;
         },
         increment(state, qty) {
-          state.numItems += qty
+          state.numItems += qty;
         },
         decrement(state, qty) {
-          state.numItems -= qty
-        }
-      }
+          state.numItems -= qty;
+        },
+      },
     });
 
     const navbarApp = Vue.createApp({
-      delimiters: ['[[', ']]'],
+      delimiters: ["[[", "]]"],
       data() {
         return {
           isOpen: false,
-          activeCategory: window.activeCategory || null
-
-        }
+          activeCategory: window.activeCategory || null,
+          searchQuery: "", // Add this line
+        };
       },
       computed: {
         numItems() {
-          return this.$store.state.numItems
-        }
+          return this.$store.state.numItems;
+        },
+      },
+      methods: {
+        search() {
+          if (this.searchQuery.trim()) {
+            window.location.href = `/search/?q=${encodeURIComponent(this.searchQuery)}`;
+          }
+        },
       },
       mounted() {
-        console.log(this.activeCategory); // <-- Move here
-
         // Fetch cart count from API for live update
-        fetch('/api/cart_count/')
-          .then(res => res.json())
-          .then(data => this.$store.commit('setCount', data.count))
-          .catch(err => console.error(err));
-      }
+        fetch("/api/cart_count/")
+          .then((res) => res.json())
+          .then((data) => this.$store.commit("setCount", data.count))
+          .catch((err) => console.error(err));
+      },
     });
 
     navbarApp.use(store);
-    navbarApp.mount('#navbarApp');
+    navbarApp.mount("#navbarApp");
   </script>
-  {% block script %}
-  {% endblock %}
+  {% block script %} {% endblock %}
 </body>
 
 </html>

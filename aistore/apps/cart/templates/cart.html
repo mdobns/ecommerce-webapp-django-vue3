@@ -11,6 +11,7 @@
         <table class="min-w-full divide-y divide-gray-700">
             <thead class="bg-gray-800">
                 <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider"></th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Product</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Quantity</th>
                     <th class="px-6 py-3 text-left text-xs font-medium text-gray-400 uppercase tracking-wider">Price</th>
@@ -19,7 +20,14 @@
             </thead>
             <tbody class="bg-gray-900 divide-y divide-gray-700">
                 <tr v-for="product in products" :key="product.id">
-                    <td class="px-6 py-4 whitespace-nowrap">[[ product.title ]]</td>
+                    <td>
+                        <img :src="product.thumbnail" class="w-14 h-14 object-cover rounded" alt="Product image">
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <a :href="product.url" class="text-lg font-semibold text-white hover:underline">
+                        [[ product.title ]]
+                        </a>
+                    </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <button class="px-2 py-1 bg-gray-700 text-white rounded hover:bg-gray-600"
                             @click="decrementQuantity(product.id, product.quantity)">-</button>

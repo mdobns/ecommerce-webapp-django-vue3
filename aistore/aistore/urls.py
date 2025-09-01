@@ -21,7 +21,7 @@ from django.urls import path
 from apps.cart.webhook import webhook
 from apps.cart.views import cart_detail, success
 from apps.core.views import frontpage , contact , about
-from apps.store.views import product_detail,category_detail
+from apps.store.views import product_detail,category_detail, search
 from apps.coupon.api import api_can_use
 from apps.store.api import api_add_to_cart,api_remove_from_cart, checkout ,create_checkout_session
 
@@ -43,6 +43,7 @@ urlpatterns = [
     path('api/checkout/', checkout , name ='checkout' ),
 
     #Store
+    path("search/", search , name="search" ),
     path("<slug:category_slug>/<slug:slug>/", product_detail , name="product_detail"),
     path("<slug:slug>/", category_detail , name="category_detail"),
 ]

@@ -14,11 +14,14 @@ def cart_detail(request):
     for item in cart:  # item is the dict
         try:
             product = Product.objects.get(id=item['id'])
+            url = f"/{product.category.slug}/{product.slug}/"
         except Product.DoesNotExist:
             continue
 
         quantity = item.get('quantity', 0)
         products_in_cart.append({
+            'url': url,
+            'thumbnail': product.thumbnail.url,
             'id': product.id,
             'title': product.title,
             'price': float(product.price),

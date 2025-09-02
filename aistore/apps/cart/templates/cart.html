@@ -240,34 +240,41 @@ const productapp = Vue.createApp({
             }
         },
         incrementQuantity(product_id, quantity) {
-            const data = {
-                product_id: product_id,
-                update: true,
-                quantity: quantity + 1
-            }
-            this.$store.commit('increment', 1)
-            fetch('/api/add_to_cart/', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRFToken': '{{ csrf_token }}'
-                },
-                credentials: 'same-origin',
-                body: JSON.stringify(data)
-            })
-            .then(response => {
-                this.products = this.products.map(product => {
-                    if (product.id === product_id) {
-                        return {
-                            ...product,
-                            quantity: product.quantity + 1,
-                            total_cost: (product.quantity + 1) * product.price
-                        };
+            for (const product of this.products) {
+                if (product.id === product_id && product.quantity < product.num_available) {
+                    const data = {
+                        product_id: product_id,
+                        update: true,
+                        quantity: quantity + 1
                     }
-                    return product;
-                })
-            })
-            .catch(error => console.error('Error:', error))
+                    this.$store.commit('increment', 1)
+                    fetch('/api/add_to_cart/', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRFToken': '{{ csrf_token }}'
+                        },
+                        credentials: 'same-origin',
+                        body: JSON.stringify(data)
+                    })
+                    .then(response => {
+                        this.products = this.products.map(p => {
+                            if (p.id === product_id) {
+                                return {
+                                    ...p,
+                                    quantity: p.quantity + 1,
+                                    total_cost: (p.quantity + 1) * p.price
+                                };
+                            }
+                            return p;
+                        })
+                    })
+                    .catch(error => console.error('Error:', error))
+                } else if (product.id === product_id) {
+                    alert("No more items are available in stock.");
+                    return;
+                }
+            }
         },
         decrementQuantity(product_id, quantity) {
             const data = {

@@ -27,7 +27,8 @@ def cart_detail(request):
             'title': product.title,
             'price': float(product.price),
             'quantity': quantity,
-            'total_cost': float(product.price) * quantity
+            'total_cost': float(product.price) * quantity,
+            'num_available': product.num_available
         })
 
     context = {

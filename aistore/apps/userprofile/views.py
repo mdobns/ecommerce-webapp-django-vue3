@@ -17,3 +17,7 @@ def signup(request):
     else:
         form = SignUpForm()
     return render(request, 'signup.html', {'form': form})
+
+@login_required
+def myaccount(request):
+    return render(request, 'myaccount.html')

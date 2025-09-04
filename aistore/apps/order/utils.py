@@ -10,6 +10,8 @@ def checkout(request, first_name, last_name, email, address, zipcode, place):
         zipcode=zipcode,
         place=place
     )
+    if request.user.is_authenticated:
+        order.user = request.user
     order.save()
 
     cart = Cart(request)

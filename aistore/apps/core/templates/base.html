@@ -88,6 +88,17 @@
           🛒 Cart <span>([[ numItems ]])</span>
         </a>
       </div>
+      {% if user.is_authenticated %}
+        <a href="{% url 'logout' %}"
+          class="block px-4 py-2 bg-gradient-to-r from-red-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
+          Logout
+        </a>
+      {%else %}
+        <a href="{% url 'login' %}"
+          class="block px-4 py-2 bg-gradient-to-r from-green-600 to-blue-500 text-white rounded-xl shadow-md hover:scale-105 transform transition">
+          Login
+        </a>
+      {% endif %}
     </div>
   </nav>
 

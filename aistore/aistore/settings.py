@@ -20,7 +20,9 @@ SECRET_KEY = 'django-insecure-nu!=f@alixvvo%72_6c=$k3q+9c5*bh_!yb!ck_2rjy865!6$8
 DEBUG = True
 
 ALLOWED_HOSTS = []
-
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'cart'
+LOGOUT_REDIRECT_URL = 'frontpage'
 #Cart
 
 SESSION_COOKIE_AGE = 86400
@@ -41,6 +43,8 @@ INSTALLED_APPS = [
     'apps.order',
     'stripe',
     'apps.coupon',
+    'apps.userprofile',
+    
 ]
 
 MIDDLEWARE = [

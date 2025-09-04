@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up |{% endblock %}
+
+{% block content %}
+   <form action="." method="POST" class="max-w-md mx-auto bg-gray-900 rounded-xl shadow-lg p-8 mt-8">
+    {% csrf_token %}
+
+    {% for field in form %}
+        <div class="mb-4">
+            <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-200 mb-1">
+                {{ field.label }}
+            </label>
+            {{ field }}
+            {% if field.help_text %}
+                <p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>
+            {% endif %}
+            {% for error in field.errors %}
+                <p class="text-xs text-red-400 mt-1">{{ error }}</p>
+            {% endfor %}
+        </div>
+    {% endfor %}
+
+    <div class="flex justify-center mt-6">
+        <button type="submit"
+            class="px-6 py-3 bg-gradient-to-r from-green-500 to-green-700 rounded-xl shadow-md text-white font-semibold hover:scale-105 transform transition">
+            Sign Up
+        </button>
+    </div>
+</form>
+{% endblock %}

@@ -30,9 +30,20 @@ def cart_detail(request):
             'total_cost': float(product.price) * quantity,
             'num_available': product.num_available
         })
+    if request.user.is_authenticated:
+        first_name = request.user.first_name
+        last_name = request.user.last_name
+        email = request.user.email
+    else:
+        first_name = ''
+        last_name = ''
+        email = ''
 
     context = {
         'cart': cart,
+        'first_name': first_name,
+        'last_name': last_name,
+        'email': email,
         'pub_key' : settings.STRIPE_API_KEY_PUBLISHABLE,
         'products_json': json.dumps(products_in_cart)
     }

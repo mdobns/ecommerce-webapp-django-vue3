@@ -24,7 +24,7 @@ from apps.core.views import frontpage , contact , about
 from apps.store.views import product_detail,category_detail, search
 from apps.userprofile.views import signup, myaccount
 from apps.coupon.api import api_can_use
-from apps.store.api import api_add_to_cart,api_remove_from_cart, checkout ,create_checkout_session
+from apps.store.api import api_add_to_cart,api_remove_from_cart, checkout ,create_checkout_session, add_to_cart_form
 from django.contrib.auth import views
 
 urlpatterns = [
@@ -35,6 +35,7 @@ urlpatterns = [
     path("cart/success/", success, name="success"),
     path("contact/", contact, name= 'contact'),
     path("about/", about, name= 'about'),
+    
 
     #auth
     path("myaccount/", myaccount, name= 'myaccount'),
@@ -49,6 +50,7 @@ urlpatterns = [
     path("api/add_to_cart/", api_add_to_cart, name="api_add_to_cart"),
     path("api/remove_from_cart/", api_remove_from_cart, name="api_remove_from_cart"),
     path('api/checkout/', checkout , name ='checkout' ),
+    path("cart/add/", add_to_cart_form, name="add_to_cart_form"),
 
     #Store
     path("search/", search , name="search" ),

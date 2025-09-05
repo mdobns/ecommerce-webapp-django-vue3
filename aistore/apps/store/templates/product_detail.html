@@ -30,6 +30,74 @@
             {{ product.description }}
         </p>
     {% endif %}
+    {% if product.variants.all|length > 0 %}
+    <h3 class="text-xl font-bold text-white mb-4 mt-8">Product & Variants</h3>
+    <table class="min-w-full bg-gray-800 rounded-xl overflow-hidden mb-8">
+        <thead>
+            <tr>
+                <th class="px-4 py-2 text-left text-gray-300">Image</th>
+                <th class="px-4 py-2 text-left text-gray-300">Title</th>
+                <th class="px-4 py-2 text-left text-gray-300">Price</th>
+                <th class="px-4 py-2 text-left text-gray-300">Stock</th>
+                <th class="px-4 py-2 text-left text-gray-300">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Main product row -->
+            <tr>
+                <td>
+                    {% if product.thumbnail %}
+                        <img src="{{ product.thumbnail.url }}" class="flex justify-center items-center h-16 rounded-lg" alt="Main product image">
+                    {% endif %}
+                </td>
+                <td class="font-semibold text-white">{{ product.title }}</td>
+                <td class="text-pink-400 font-bold ">{{ product.price }}৳</td>
+                <td class="text-xs text-gray-400 text-center">{{ product.num_available }}</td>
+                <td>
+                    <template v-if="cartIds.includes({{ product.id }})">
+                        <a href="{% url 'cart' %}"
+                           class="px-4 py-2 bg-green-600 rounded text-white font-medium inline-block transition duration-200 ease-in-out hover:scale-105">
+                            ✅ Already in Cart
+                        </a>
+                    </template>
+                    <template v-else>
+                        <button @click="addToCartVariant({{ product.id }})"
+                                class="px-4 py-2 bg-pink-500 rounded text-white font-medium transition duration-200 ease-in-out hover:scale-105">
+                            🛒 Add to Cart
+                        </button>
+                    </template>
+                </td>
+            </tr>
+            <!-- Variant rows -->
+            {% for variant in product.variants.all %}
+            <tr>
+                <td>
+                    {% if variant.thumbnail %}
+                        <img src="{{ variant.thumbnail.url }}" class="flex justify-center items-center h-16 rounded-lg" alt="Variant image">
+                    {% endif %}
+                </td>
+                <td class="font-semibold text-white">{{ variant.title }}</td>
+                <td class="text-pink-400 font-bold">{{ variant.price }}৳</td>
+                <td class="text-xs text-gray-400 text-center">{{ variant.num_available }}</td>
+                <td>
+                    <template v-if="cartIds.includes({{ variant.id }})">
+                        <a href="{% url 'cart' %}"
+                           class="px-4 py-2 bg-green-600 rounded text-white font-medium inline-block transition duration-200 ease-in-out hover:scale-105">
+                            ✅ Already in Cart</span>
+                        </a>
+                    </template>
+                    <template v-else>
+                        <button @click="addToCartVariant({{ variant.id }})"
+                                class="px-4 py-2 bg-pink-500 rounded text-white font-medium transition duration-200 ease-in-out hover:scale-105">
+                            🛒 Add to Cart
+                        </button>
+                    </template>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
 
     <!-- Cart Button Logic (Vue controlled) -->
     <div class="flex mt-6">
@@ -58,9 +126,8 @@
     </div>
     <!-- Add to Cart Button -->
     <div class="flex flex-row space-x-4 mt-6">
+{% endif %}
 
-
-    <!-- Add this inside your main div, e.g. after the buttons -->
     <div v-if="notification" class="fixed top-20 left-1/2 transform -translate-x-1/2 bg-green-600 text-white px-6 py-3 rounded-xl shadow-lg z-50 transition">
         [[ notification ]]
     </div>
@@ -77,8 +144,8 @@ const productapp = Vue.createApp({
             notification: '' ,
             mainImage: '{{ product.image.url }}',
             images: {{ productstring|safe }},
-            in_cart: {{ in_cart|yesno:"true,false" }}, // reactive in_cart from Django context
-
+            in_cart: {{ in_cart|yesno:"true,false" }},
+            cartIds: {{ cart_items|default:"[]"|safe }},
                 }
     },
     mounted() {
@@ -144,7 +211,34 @@ const productapp = Vue.createApp({
         .catch(error => {
             console.error('Error:', error);
         });
-    }
+    },
+        addToCartVariant(product_id) {
+            fetch('{% url "add_to_cart_form" %}', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: `product_id=${product_id}&quantity=1`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    if (!this.cartIds.includes(product_id)) {
+                        this.cartIds.push(product_id);
+                    }
+                    this.notification = 'Product added to cart!';
+                    this.$store.commit('increment', 1);
+                    setTimeout(() => {
+                        this.notification = '';
+                    }, 2000);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     }
 })
 productapp.use(store)

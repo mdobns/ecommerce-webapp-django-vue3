@@ -79,7 +79,6 @@ def create_checkout_session(request):
 
         # Stripe expects cents, but your order.paid_amount should be in main currency
         order.paid_amount = total_cost // 100  # convert back to main currency
-# ...existing code...
         order.used_coupon = coupon_code
         order.save()
         return JsonResponse({'id': session.id})
@@ -112,6 +111,19 @@ def checkout(request):
         cart.clear()
     return JsonResponse({'success': True, 'order_id': orderid})
 
+def add_to_cart_form(request):
+    if request.method == "POST":
+        product_id = request.POST.get("product_id")
+        quantity = int(request.POST.get("quantity", 1))
+        cart = Cart(request)
+        product = get_object_or_404(Product, pk=product_id)
+        cart.add(product=product, quantity=quantity, update_quantity=False)
+
+        # Check if AJAX request
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            return JsonResponse({'success': True})
+        else:
+            return redirect('cart')
 
 def api_add_to_cart(request):
     data = json.loads(request.body)

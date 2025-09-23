@@ -3,6 +3,7 @@
 {% block title %}Sign Up |{% endblock %}
 
 {% block content %}
+<div id="signupapp">
    <form action="." method="POST" class="max-w-md mx-auto bg-gray-900 rounded-xl shadow-lg p-8 mt-8">
     {% csrf_token %}
 
@@ -11,8 +12,100 @@
             <label for="{{ field.id_for_label }}" class="block text-sm font-medium text-gray-200 mb-1">
                 {{ field.label }}
             </label>
-            {{ field }}
-            {% if field.help_text %}
+            {% if field.field.widget.input_type == 'password' %}
+                <div class="relative">
+                    <input :type="'{{ field.html_name }}' === 'password1' ? (showPassword1 ? 'text' : 'password') : (showPassword2 ? 'text' : 'password')" 
+                           name="{{ field.html_name }}" 
+                           id="{{ field.id_for_label }}" 
+                           value="{{ field.value|default:'' }}"
+                           @input="validatePassword($event.target.value, '{{ field.html_name }}')"
+                           @focus="onPasswordFocus('{{ field.html_name }}')"
+                           class="w-full px-3 py-2 pr-10 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                           {% if field.field.required %}required{% endif %}>
+                    <button type="button" 
+                            @click="'{{ field.html_name }}' === 'password1' ? togglePassword1() : togglePassword2()"
+                            class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-white">
+                        <span v-if="'{{ field.html_name }}' === 'password1' ? showPassword1 : showPassword2">👁️</span>
+                        <span v-else>🙈</span>
+                    </button>
+                </div>
+                
+                <!-- Password criteria display -->
+                {% if field.html_name == 'password1' %}
+                <div v-show="showCriteria" class="mt-2 p-3 bg-gray-800 rounded-lg text-xs">
+                    <p class="text-gray-300 mb-2 font-semibold">Password must contain:</p>
+                    <div class="space-y-1">
+                        <div class="flex items-center">
+                            <span v-if="criteria.length" class="mr-2 text-green-400">✓</span>
+                            <span v-else class="mr-2 text-red-400">✗</span>
+                            <span :class="criteria.length ? 'text-green-400' : 'text-gray-400'">
+                                At least 8 characters
+                            </span>
+                        </div>
+                        <div class="flex items-center">
+                            <span v-if="criteria.uppercase" class="mr-2 text-green-400">✓</span>
+                            <span v-else class="mr-2 text-red-400">✗</span>
+                            <span :class="criteria.uppercase ? 'text-green-400' : 'text-gray-400'">
+                                One uppercase letter
+                            </span>
+                        </div>
+                        <div class="flex items-center">
+                            <span v-if="criteria.lowercase" class="mr-2 text-green-400">✓</span>
+                            <span v-else class="mr-2 text-red-400">✗</span>
+                            <span :class="criteria.lowercase ? 'text-green-400' : 'text-gray-400'">
+                                One lowercase letter
+                            </span>
+                        </div>
+                        <div class="flex items-center">
+                            <span v-if="criteria.number" class="mr-2 text-green-400">✓</span>
+                            <span v-else class="mr-2 text-red-400">✗</span>
+                            <span :class="criteria.number ? 'text-green-400' : 'text-gray-400'">
+                                One number
+                            </span>
+                        </div>
+                        <div class="flex items-center">
+                            <span v-if="criteria.special" class="mr-2 text-green-400">✓</span>
+                            <span v-else class="mr-2 text-red-400">✗</span>
+                            <span :class="criteria.special ? 'text-green-400' : 'text-gray-400'">
+                                One special character
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Password confirmation validation -->
+                {% if field.html_name == 'password2' %}
+                <div v-if="password2.length > 0 && !passwordsMatch" class="mt-2 p-2 bg-red-900/50 rounded-lg text-xs">
+                    <div class="flex items-center">
+                        <span class="mr-2 text-red-400">✗</span>
+                        <span class="text-red-400">Passwords do not match</span>
+                    </div>
+                </div>
+                <div v-if="password2.length > 0 && passwordsMatch" class="mt-2 p-2 bg-green-900/50 rounded-lg text-xs">
+                    <div class="flex items-center">
+                        <span class="mr-2 text-green-400">✓</span>
+                        <span class="text-green-400">Passwords match</span>
+                    </div>
+                </div>
+                {% endif %}
+            {% elif field.field.widget.input_type == 'textarea' %}
+                <textarea class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent" {{ field.html_name }} id="{{ field.id_for_label }}">{{ field.value|default:'' }}</textarea>
+            {% elif field.field.widget.input_type == 'select' %}
+                <select class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent" name="{{ field.html_name }}" id="{{ field.id_for_label }}">
+                    {% for option in field.field.choices %}
+                        <option value="{{ option.0 }}" {% if field.value == option.0 %}selected{% endif %}>{{ option.1 }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}" 
+                       name="{{ field.html_name }}" 
+                       id="{{ field.id_for_label }}" 
+                       value="{{ field.value|default:'' }}"
+                       class="w-full px-3 py-2 bg-gray-800 border border-gray-600 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-pink-500 focus:border-transparent"
+                       {% if field.field.required %}required{% endif %}>
+            {% endif %}
+            {% if field.help_text and 'password' not in field.html_name and field.html_name != 'username' %}
                 <p class="text-xs text-gray-400 mt-1">{{ field.help_text }}</p>
             {% endif %}
             {% for error in field.errors %}
@@ -28,4 +121,62 @@
         </button>
     </div>
 </form>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+const { createApp } = Vue;
+
+createApp({
+    delimiters: ['[[', ']]'],
+    data() {
+        return {
+            showCriteria: false,
+            showPassword1: false,
+            showPassword2: false,
+            password1: '',
+            password2: '',
+            criteria: {
+                length: false,
+                uppercase: false,
+                lowercase: false,
+                number: false,
+                special: false
+            }
+        }
+    },
+    computed: {
+        passwordsMatch() {
+            return this.password1 === this.password2;
+        }
+    },
+    methods: {
+        togglePassword1() {
+            this.showPassword1 = !this.showPassword1;
+        },
+        togglePassword2() {
+            this.showPassword2 = !this.showPassword2;
+        },
+        onPasswordFocus(fieldName) {
+            if (fieldName === 'password1') {
+                this.showCriteria = true;
+            }
+        },
+        validatePassword(password, fieldName) {
+            if (fieldName === 'password1') {
+                this.password1 = password;
+                this.showCriteria = password.length > 0;
+                this.criteria.length = password.length >= 8;
+                this.criteria.uppercase = /[A-Z]/.test(password);
+                this.criteria.lowercase = /[a-z]/.test(password);
+                this.criteria.number = /\d/.test(password);
+                this.criteria.special = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+            } else if (fieldName === 'password2') {
+                this.password2 = password;
+            }
+        }
+    }
+}).mount('#signupapp');
+</script>
 {% endblock %}

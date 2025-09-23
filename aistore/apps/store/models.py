@@ -24,7 +24,7 @@ class Product(models.Model):
     description = models.TextField(blank=True, null=True)
     is_featured = models.BooleanField(default=False)
     price = models.FloatField()
-
+    view_count = models.PositiveIntegerField(default=0)
     num_available = models.IntegerField(default=1)
 
     image = models.ImageField(upload_to='uploads/', blank=True, null=True)

@@ -12,6 +12,11 @@ def search(request):
 
 def product_detail(request, category_slug, slug):
     product = get_object_or_404(Product, slug=slug,)
+    
+    # Increment view count
+    product.view_count += 1
+    product.save(update_fields=['view_count'])
+    
     cart = Cart(request)
     in_cart = cart.has_product(product.id)
     cart_items = [item['product'].id for item in cart]

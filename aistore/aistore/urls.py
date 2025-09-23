@@ -20,7 +20,7 @@ from django.conf.urls.static import static
 from django.urls import path
 from apps.cart.webhook import webhook
 from apps.cart.views import cart_detail, success
-from apps.core.views import frontpage , contact , about
+from apps.core.views import frontpage , contact , about, featured_products_page
 from apps.store.views import product_detail,category_detail, search
 from apps.userprofile.views import signup, myaccount
 from apps.coupon.api import api_can_use
@@ -35,7 +35,7 @@ urlpatterns = [
     path("cart/success/", success, name="success"),
     path("contact/", contact, name= 'contact'),
     path("about/", about, name= 'about'),
-    
+    path("featured/", featured_products_page, name= 'featured_products'),
 
     #auth
     path("myaccount/", myaccount, name= 'myaccount'),

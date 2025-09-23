@@ -1,6 +1,102 @@
 {% extends 'base.html' %}
+{% load dict_extras %}
 {% block title %}Welcome | {% endblock %}
 {% block content %}
+
+{% if featured_products %}
+<div class="mb-12">
+    <div class="flex justify-between items-center mb-6">
+        <h2 class="text-3xl font-bold text-white">🔥 Featured Products</h2>
+        <a href="{% url 'featured_products' %}" class="text-pink-400 hover:text-pink-300 font-semibold flex items-center">
+            See More
+            <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+            </svg>
+        </a>
+    </div>
+    
+    <!-- Featured Products Horizontal Scroll -->
+    <div class="overflow-x-auto pb-4">
+        <div class="flex space-x-6 min-w-max">
+            {% for product in featured_products|slice:":8" %}
+                <div class="flex-shrink-0 w-64">
+                    <div class="relative">
+                        {% if product.is_featured %}
+                        <span class="absolute top-2 left-2 bg-gradient-to-r from-pink-500 to-purple-600 text-white text-xs font-bold px-2 py-1 rounded-full z-10">
+                            FEATURED
+                        </span>
+                        {% endif %}
+                        {% include "partials/product_card.html" %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- Category Banners -->
+{% for category in categories %}
+    {% if category_products|lookup:category.id %}
+    <div class="mb-12">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-bold text-white flex items-center">
+                {% if "electronics" in category.title|lower or "electronic" in category.title|lower or "smartphone" in category.title|lower or "gadget" in category.title|lower %}
+                    📱
+                {% elif "clothing" in category.title|lower or "fashion" in category.title|lower or "apparel" in category.title|lower %}
+                    👕
+                {% elif "book" in category.title|lower %}
+                    📚
+                {% elif "home" in category.title|lower or "furniture" in category.title|lower %}
+                    🏠
+                {% elif "sport" in category.title|lower or "fitness" in category.title|lower %}
+                    ⚽
+                {% elif "beauty" in category.title|lower or "cosmetic" in category.title|lower %}
+                    💄
+                {% elif "food" in category.title|lower or "grocery" in category.title|lower %}
+                    🍎
+                {% elif "computer" in category.title|lower or "game" in category.title|lower %}
+                    🎮
+                {% elif "jewelry" in category.title|lower or "accessori" in category.title|lower %}
+                    💍
+                {% elif "automotive" in category.title|lower or "car" in category.title|lower %}
+                    🚗
+                {% elif "music" in category.title|lower or "instrument" in category.title|lower %}
+                    🎵
+                {% elif "art" in category.title|lower or "craft" in category.title|lower %}
+                    🎨
+                {% elif "health" in category.title|lower or "medical" in category.title|lower %}
+                    🏥
+                {% elif "pet" in category.title|lower or "animal" in category.title|lower %}
+                    🐾
+                {% elif "headphones" in category.title|lower or "luggage" in category.title|lower %}
+                    🎧
+                {% else %}
+                
+                    📦
+                {% endif %}
+                <span class="ml-2">{{ category.title }}</span>
+            </h2>
+            <a href="{% url 'category_detail' category.slug %}" class="text-pink-400 hover:text-pink-300 font-semibold flex items-center">
+                View All
+                <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+            </a>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+            {% for product in category_products|lookup:category.id %}
+                {% include "partials/product_card.html" %}
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+{% endfor %}
+
+<div class="mb-6">
+    <h2 class="text-2xl font-bold text-white">All Products</h2>
+</div>
 
 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
     {% for product in products %}

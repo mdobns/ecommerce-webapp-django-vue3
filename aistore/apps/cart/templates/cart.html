@@ -65,7 +65,22 @@
                     class="px-6 py-2 bg-purple-600 text-white font-semibold rounded-lg shadow-md hover:bg-purple-700 transition">
                     Apply Coupon
                 </button>
+            </div>
             
+            <!-- Coupon Error Message -->
+            <div v-if="couponError" class="mt-2 p-2 bg-red-900/50 rounded-lg text-xs">
+                <div class="flex items-center">
+                    <span class="mr-2 text-red-400">✗</span>
+                    <span class="text-red-400">[[ couponError ]]</span>
+                </div>
+            </div>
+            
+            <!-- Coupon Success Message -->
+            <div v-if="coupon_value > 0 && !couponError" class="mt-2 p-2 bg-green-900/50 rounded-lg text-xs">
+                <div class="flex items-center">
+                    <span class="mr-2 text-green-400">✓</span>
+                    <span class="text-green-400">Coupon applied successfully! You saved [[ coupon_value ]]%</span>
+                </div>
             </div>
 
             {% if not user.is_authenticated %}
@@ -167,7 +182,8 @@ const productapp = Vue.createApp({
             place: '',
             products: {{ products_json | safe }},
             coupon_value: 0,
-            coupon_code: ''
+            coupon_code: '',
+            couponError: ''
         }
     },
     computed: {
@@ -191,6 +207,7 @@ const productapp = Vue.createApp({
         },
         applyCoupon() {
             if (this.coupon_code !== '') {
+                this.couponError = ''; // Clear previous errors
                 fetch(`/api/can_use/?code=${encodeURIComponent(this.coupon_code)}`, {
                     method: 'GET',
                     headers: {
@@ -203,13 +220,19 @@ const productapp = Vue.createApp({
                 .then(data => {
                     if (data.amount) {
                         this.coupon_value = data.amount;
+                        this.couponError = '';
                     } else {
                         this.coupon_value = 0;
+                        this.couponError = 'Invalid coupon code or coupon has expired';
                     }
                 })
-                .catch(error => console.error('Error:', error));
+                .catch(error => {
+                    console.error('Error:', error);
+                    this.couponError = 'Error applying coupon. Please try again.';
+                    this.coupon_value = 0;
+                });
             } else {
-                alert("Please enter a coupon code.");
+                this.couponError = 'Please enter a coupon code';
             }
         },
         buy() {

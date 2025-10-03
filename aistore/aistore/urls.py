@@ -17,7 +17,7 @@ Including another URLconf
 from django.contrib import admin
 from django.conf import settings
 from django.conf.urls.static import static
-from django.urls import path
+from django.urls import path, include
 from apps.cart.webhook import webhook
 from apps.cart.views import cart_detail, success
 from apps.core.views import frontpage , contact , about, featured_products_page
@@ -51,6 +51,9 @@ urlpatterns = [
     path("api/remove_from_cart/", api_remove_from_cart, name="api_remove_from_cart"),
     path('api/checkout/', checkout , name ='checkout' ),
     path("cart/add/", add_to_cart_form, name="add_to_cart_form"),
+
+    #Chatbot
+    path('chatbot/', include('apps.chatbot.urls')),
 
     #Store
     path("search/", search , name="search" ),
